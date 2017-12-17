@@ -1,5 +1,6 @@
 package CourseWork;
 
+import java.util.ArrayDeque;
 import java.util.Scanner;
 
 class Filling {
@@ -12,6 +13,11 @@ class Filling {
     //несуществующее ведро, представляющее собой результат переливания из 2 ведра в 3е
     private Bucket difference = new Bucket(Math.abs(two.getVolume() - three.getVolume()));
     boolean success = false;
+//    ArrayDeque<Integer> result;
+
+//    private void resSuccess(ArrayDeque res){
+//        this.result = res;
+//    }
 
     //если достигли нужного объёма
     private void trueSuccess() {
@@ -55,8 +61,6 @@ class Filling {
         return this.desVolume;
     }
 
-    // TODO: 14.12.2017 add some heuristics for big volumes
-    // TODO: 14.12.2017 add list for steps (or smth else)
     void recFill() {
         //если ещё не нашли решения
         if (!success) {
@@ -85,8 +89,45 @@ class Filling {
                 recFill();
                 this.one.nowVolume += this.difference.getVolume();
             }
-            //если решение не найдено, то возвращаем неизменённым
-//           return;
+        }
+
+    }
+    void recFill(ArrayDeque res) {
+        //если ещё не нашли решения
+        if (!success) {
+            //если объём уже найден
+            if (this.one.getVolume() == this.getDesVolume()) {
+                trueSuccess();
+//                resSuccess(res);
+                System.out.println(res);
+                return;
+            }
+            //если можем вылить объём второго ведра и не сделать меньше желаемого
+            if (this.one.getVolume() - this.two.getVolume() >= this.getDesVolume()) {
+                this.one.refill(two);
+                res.add(two.getVolume());
+                //используем поиск с возвратом
+                recFill(res);
+                this.one.nowVolume += this.two.getVolume();
+                res.removeLast();
+            }
+            //если можем вылить объём третьего ведра и не сделать меньше желаемого
+            if (this.one.getVolume() - this.three.getVolume() >= this.getDesVolume()) {
+                this.one.refill(three);
+                res.add(three.getVolume());
+                recFill(res);
+                this.one.nowVolume += this.three.getVolume();
+                res.removeLast();
+            }
+            //если можем вылить из основного ведра объём равный разнице между
+            //вторым и третьим и не сделать меньше желаемого
+            if (this.one.getVolume() - this.difference.getVolume() >= this.getDesVolume()) {
+                this.one.refill(difference);
+                res.add(difference.getVolume());
+                recFill(res);
+                this.one.nowVolume += this.difference.getVolume();
+                res.removeLast();
+            }
         }
     }
 
