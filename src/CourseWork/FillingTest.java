@@ -1,5 +1,7 @@
 package CourseWork;
 
+import java.util.ArrayDeque;
+
 import static org.junit.Assert.assertEquals;
 
 public class FillingTest {
@@ -9,11 +11,13 @@ public class FillingTest {
         System.out.println("check, main one is " + temp1.one.getVolume() + " and others are " + temp1.two.getVolume() + " and " + temp1.three.getVolume());
         temp1.setDesVolume(80);
         System.out.println("desired volume is " + temp1.getDesVolume());
-        temp1.recFill();
+        ArrayDeque<Integer> res = new ArrayDeque<>();
+        temp1.recFill(res);
         if (temp1.success)
             System.out.println("solution exists");
         else
             System.out.println("solution doesn't exist");
+        System.out.println(temp1.result);
         assertEquals(true, temp1.success);
         System.out.println();
 

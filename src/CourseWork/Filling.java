@@ -13,11 +13,12 @@ class Filling {
     //несуществующее ведро, представляющее собой результат переливания из 2 ведра в 3е
     private Bucket difference = new Bucket(Math.abs(two.getVolume() - three.getVolume()));
     boolean success = false;
-//    ArrayDeque<Integer> result;
+    ArrayDeque<Integer> result = new ArrayDeque<>();
 
-//    private void resSuccess(ArrayDeque res){
-//        this.result = res;
-//    }
+    private void resSuccess(ArrayDeque res){
+        this.result = res.clone();
+//        result.clone()
+    }
 
     //если достигли нужного объёма
     private void trueSuccess() {
@@ -98,8 +99,8 @@ class Filling {
             //если объём уже найден
             if (this.one.getVolume() == this.getDesVolume()) {
                 trueSuccess();
-//                resSuccess(res);
-                System.out.println(res);
+                resSuccess(res);
+//                System.out.println(res);
                 return;
             }
             //если можем вылить объём второго ведра и не сделать меньше желаемого
