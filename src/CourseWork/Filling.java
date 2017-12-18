@@ -11,7 +11,7 @@ class Filling {
     Bucket two = new Bucket();
     Bucket three = new Bucket();
     //несуществующее ведро, представляющее собой результат переливания из 2 ведра в 3е
-    private Bucket difference = new Bucket(Math.abs(two.getVolume() - three.getVolume()));
+    Bucket difference = new Bucket(Math.abs(two.getVolume() - three.getVolume()));
     boolean success = false;
     ArrayDeque<Integer> result = new ArrayDeque<>();
 
