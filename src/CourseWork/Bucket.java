@@ -4,9 +4,11 @@ class Bucket {
 
     //объём ведра
     int nowVolume;
+    int maxVolume;
 
     Bucket(int volume) {
         nowVolume = volume;
+        maxVolume = volume;
     }
 
     //for testing purposes
