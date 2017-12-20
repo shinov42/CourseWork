@@ -1,7 +1,6 @@
 package CourseWork;
 
 import java.util.ArrayDeque;
-import java.util.Scanner;
 
 class Filling {
     //Желаемый объём
@@ -15,9 +14,9 @@ class Filling {
     boolean success = false;
     ArrayDeque<Integer> result = new ArrayDeque<>();
 
-    private void resSuccess(ArrayDeque res){
+    //запоминаем последовательность ходов
+    private void resSuccess(ArrayDeque<Integer> res) {
         this.result = res.clone();
-//        result.clone()
     }
 
     //если достигли нужного объёма
@@ -33,35 +32,17 @@ class Filling {
         this.difference = new Bucket(Math.abs(two.getVolume() - three.getVolume()));
     }
 
-    Filling() {
-        this.one.nowVolume = setVolume(1);
-        this.two.nowVolume = setVolume(2);
-        this.three.nowVolume = setVolume(3);
-    }
-
     void setDesVolume(int volume) {
         desVolume = volume;
     }
     //for testing purposes (end)
 
-    //считываем объёмы вёдер
-    private int setVolume(int i) {
-        Scanner sc = new Scanner(System.in);
-        System.out.println("enter please volume of bucket number " + i);
-        return sc.nextInt();
-    }
-
-    //считываем желаемый объём
-    void setDesVolume() {
-        Scanner sc = new Scanner(System.in);
-        System.out.println("enter please desired volume of bucket");
-        desVolume = sc.nextInt();
-    }
 
     int getDesVolume() {
         return this.desVolume;
     }
 
+    //для тестирования
     void recFill() {
         //если ещё не нашли решения
         if (!success) {
@@ -93,19 +74,21 @@ class Filling {
         }
 
     }
-    void recFill(ArrayDeque res) {
+
+    void recFill(ArrayDeque<Integer> res) {
         //если ещё не нашли решения
         if (!success) {
             //если объём уже найден
             if (this.one.getVolume() == this.getDesVolume()) {
                 trueSuccess();
+                //запоминаем результат
                 resSuccess(res);
-//                System.out.println(res);
                 return;
             }
             //если можем вылить объём второго ведра и не сделать меньше желаемого
             if (this.one.getVolume() - this.two.getVolume() >= this.getDesVolume()) {
                 this.one.refill(two);
+                //используем мемоизацию
                 res.add(two.getVolume());
                 //используем поиск с возвратом
                 recFill(res);

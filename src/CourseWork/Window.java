@@ -3,16 +3,16 @@ package CourseWork;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayDeque;
-import java.util.concurrent.TimeUnit;
-
-//import static CourseWork.WinProgram.showVolume;
-import java.util.concurrent.TimeUnit;
-
 
 class Window extends JFrame {
-    Window(){
+
+    //сохранение результатов для отображения
+    private ArrayDeque<Integer> resultTemp;
+    private int i = -42;
+    private Filling buckets;
+
+    Window() {
         //расставляем кнопки и окна
         super("Задача о переливании воды");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -48,75 +48,88 @@ class Window extends JFrame {
         textField4.setSize(110, 25);
         textField4.setLocation(460, 300);
 
-        ImageIcon empty1 = new ImageIcon("buckets/empty.png");
-        ImageIcon empty2 = new ImageIcon("buckets/empty.png");
-        ImageIcon empty3 = new ImageIcon("buckets/empty.png");
-
         JLabel emptyOne = new JLabel(new ImageIcon("buckets//empty.png"));
-        emptyOne.setIcon(empty1);
         emptyOne.setLocation(20, 0);
         emptyOne.setSize(150, 300);
         emptyOne.setText("0");
         getContentPane().add(emptyOne);
 
         JLabel emptyTwo = new JLabel(new ImageIcon("buckets//empty.png"));
-        emptyTwo.setIcon(empty2);
         emptyTwo.setLocation(220, 0);
         emptyTwo.setSize(150, 300);
         emptyTwo.setText("0");
         getContentPane().add(emptyTwo);
 
         JLabel emptyThree = new JLabel(new ImageIcon("buckets//empty.png"));
-        emptyThree.setIcon(empty3);
         emptyThree.setLocation(420, 0);
         emptyThree.setSize(150, 300);
         emptyThree.setText("0");
-        getContentPane().add(emptyThree);
 
+        //добавляем всё в окно
+        getContentPane().add(emptyThree);
+        getContentPane().add(textField1);
+        getContentPane().add(textField2);
+        getContentPane().add(textField3);
+        getContentPane().add(textField4);
+        getContentPane().add(panel);
+
+        //задаём размер окна
+        setSize(600, 400);
+
+        //обработка нажатия на кнопку "проверить"
         button1.addActionListener(e -> {
+
             Filling temp = new Filling(Integer.parseInt(textField1.getText()), Integer.parseInt(textField2.getText()), Integer.parseInt(textField3.getText()));
             temp.setDesVolume(Integer.parseInt(textField4.getText()));
             ArrayDeque<Integer> res = new ArrayDeque<>();
             temp.recFill(res);
             JOptionPane.showMessageDialog(button1, check(temp.success) + "\n" + temp.result, "Проверка", JOptionPane.WARNING_MESSAGE);
+
         });
 
+        //обработка нажатия на кнопку "запустить"
         button2.addActionListener((ActionEvent e) -> {
-            Filling temp = new Filling(Integer.parseInt(textField1.getText()), Integer.parseInt(textField2.getText()), Integer.parseInt(textField3.getText()));
-            temp.setDesVolume(Integer.parseInt(textField4.getText()));
-            ArrayDeque<Integer> res = new ArrayDeque<>();
-            temp.recFill(res);
-            if (!temp.success)
-                JOptionPane.showMessageDialog(button2, check(false), "Проверка", JOptionPane.WARNING_MESSAGE);
+            if (i == -42) {
+                //пропускаем через алгоритмическую часть
+                Filling temp = new Filling(Integer.parseInt(textField1.getText()), Integer.parseInt(textField2.getText()), Integer.parseInt(textField3.getText()));
+                temp.setDesVolume(Integer.parseInt(textField4.getText()));
+                ArrayDeque<Integer> res = new ArrayDeque<>();
+                temp.recFill(res);
+                resultTemp = temp.result;
+                //если решения нет - выводим сообщение
 
-            showVolume(temp.one.getVolume(), emptyOne);
-            showVolume(temp.two.getVolume(), emptyTwo);
-            showVolume(temp.three.getVolume(), emptyThree);
+                if (!temp.success)
+                    JOptionPane.showMessageDialog(button2, check(false), "Проверка", JOptionPane.WARNING_MESSAGE);
+                //запоминаем число ходов
 
-            changeBuckets(temp.result, temp, emptyOne, emptyTwo, emptyThree);
+                i = 0;
+                i += temp.result.size();
+                buckets = temp;
+
+                //показываем начальный объём воды в вёдрах
+                showVolume(temp.one.getVolume(), emptyOne);
+                showVolume(temp.two.getVolume(), emptyTwo);
+                showVolume(temp.three.getVolume(), emptyThree);
+
+                //если очередь ходов не пустая
+            } else if (resultTemp.size() != 0) {
+                //меняем картинку
+                changeBuckets(resultTemp.poll(), buckets, emptyOne, emptyTwo, emptyThree);
+            } else {
+                //если пустая - сообщение о выполнении
+                JOptionPane.showMessageDialog(button2, "Выполнение закончено", "Проверка", JOptionPane.WARNING_MESSAGE);
+                i = -42;
+            }
         });
-
-        getContentPane().
-                add(textField1);
-
-        getContentPane().
-                add(textField2);
-
-        getContentPane().
-                add(textField3);
-
-        getContentPane().
-                add(textField4);
-
-        getContentPane().
-                add(panel);
-
-        setSize(600, 400);
     }
 
+    //подбираем нужную картинку в соответствии с объёмом ведра
     private void showVolume(int numb, JLabel one) {
+        //очищаем
         ((ImageIcon) one.getIcon()).getImage().flush();
+        //округляем число для простоты обработки в большую сторону
         int temp = (int) Math.ceil((double) numb / 10) * 10;
+        //ищем нужное
         switch (temp) {
             case (100):
                 one.setIcon(new ImageIcon("buckets/Full.png"));
@@ -152,67 +165,54 @@ class Window extends JFrame {
                 one.setIcon(new ImageIcon("buckets/empty.png"));
                 break;
         }
+        //выводим возле него объём воды
         one.setText(String.valueOf(numb));
     }
 
-    private void changeBuckets(ArrayDeque<Integer> result, Filling buckets, JLabel one, JLabel two, JLabel three){
-        int temp;
-        while (result.size() != 0) {
-            temp = result.poll();
-            if (temp == buckets.two.getVolume()) {
-                buckets.one.maxVolume -= temp;
+    //обработка хода
+    private void changeBuckets(int temp, Filling buckets, JLabel one, JLabel two, JLabel three) {
+        //если вылили объём равный второму ведру
+        if (temp == buckets.two.getVolume()) {
+            buckets.one.maxVolume -= temp;
+            showVolume(buckets.two.getVolume(), two);
+            showVolume(0, three);
+            showVolume(buckets.one.maxVolume, one);
+
+            //равный третьему
+        } else if (temp == buckets.three.getVolume()) {
+            buckets.one.maxVolume -= temp;
+            showVolume(buckets.three.getVolume(), two);
+            showVolume(buckets.one.maxVolume, one);
+            showVolume(0, two);
+
+            //разнице между ними
+        } else if (temp == buckets.difference.getVolume()) {
+            if (buckets.two.getVolume() > buckets.three.getVolume()) {
+                buckets.one.maxVolume -= buckets.two.getVolume();
                 showVolume(buckets.two.getVolume(), two);
                 showVolume(0, three);
-                showVolume(buckets.one.maxVolume, one);
-//                Thread.sleep(4000);
-                timeout();
-
-            } else if (temp == buckets.three.getVolume()) {
-                buckets.one.maxVolume -= temp;
-                showVolume(buckets.three.getVolume(), two);
+                showVolume(buckets.two.getVolume() - buckets.three.getVolume(), two);
+                showVolume(buckets.three.getVolume(), three);
+                buckets.one.maxVolume += buckets.three.getVolume();
                 showVolume(buckets.one.maxVolume, one);
                 showVolume(0, two);
-//                Thread.sleep(4000);
-                timeout();
-
-            } else if (temp == buckets.difference.getVolume()) {
-                if (buckets.two.getVolume() > buckets.three.getVolume()) {
-                    buckets.one.maxVolume -= buckets.two.getVolume();
-                    showVolume(buckets.two.getVolume(), two);
-                    showVolume(0, three);
-//                    Thread.sleep(4000);
-                    timeout();//pause
-                    showVolume(buckets.two.getVolume() - buckets.three.getVolume(), two);
-                    showVolume(buckets.three.getVolume(), three);
-//                    Thread.sleep(4000);
-                    timeout();//pause
-                    buckets.one.maxVolume += buckets.three.getVolume();
-                    showVolume(buckets.one.maxVolume, one);
-                    showVolume(0, two);
-                    showVolume(0, three);
-                } else if (buckets.three.getVolume() > buckets.two.getVolume()) {
-                    buckets.one.maxVolume -= buckets.three.getVolume();
-                    showVolume(buckets.three.getVolume(), two);
-                    showVolume(0, two);
-//                    Thread.sleep(4000);
-                    timeout();//pause
-                    showVolume(buckets.three.getVolume() - buckets.two.getVolume(), two);
-                    showVolume(buckets.two.getVolume(), three);
-//                    Thread.sleep(4000);
-                    timeout();      //pause
-                    buckets.one.maxVolume += buckets.two.getVolume();
-                    showVolume(buckets.one.maxVolume, one);
-                    showVolume(0, two);
-                    showVolume(0, three);
-                }
+                showVolume(0, three);
+            } else if (buckets.three.getVolume() > buckets.two.getVolume()) {
+                buckets.one.maxVolume -= buckets.three.getVolume();
+                showVolume(buckets.three.getVolume(), two);
+                showVolume(0, two);
+                showVolume(buckets.three.getVolume() - buckets.two.getVolume(), two);
+                showVolume(buckets.two.getVolume(), three);
+                buckets.one.maxVolume += buckets.two.getVolume();
+                showVolume(buckets.one.maxVolume, one);
+                showVolume(0, two);
+                showVolume(0, three);
             }
-
         }
+
     }
 
-    private void timeout() {
-    }
-
+    //метод для вывода сообщения
     private String check(boolean success) {
         if (success)
             return ("Операция возможна");

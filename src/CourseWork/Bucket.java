@@ -6,6 +6,7 @@ class Bucket {
     int nowVolume;
     int maxVolume;
 
+    //задаём объёмы вёдер
     Bucket(int volume) {
         nowVolume = volume;
         maxVolume = volume;
@@ -22,7 +23,7 @@ class Bucket {
             this.nowVolume = temp;
     }
 
-    //getter
+    //получить текущий объём воды в ведре
     int getVolume() {
         return nowVolume;
     }
