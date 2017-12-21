@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 public class FillingTest {
     @org.junit.Test
-    public void main() throws Exception {
+    public void main(){
         Filling temp1 = new Filling(87, 2, 3);
         temp1.setDesVolume(80);
         temp1.recFill();

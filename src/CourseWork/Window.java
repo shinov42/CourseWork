@@ -9,7 +9,7 @@ class Window extends JFrame {
 
     //сохранение результатов для отображения
     private ArrayDeque<Integer> resultTemp;
-    private int i = -42;
+    private boolean i = false;
     private Filling buckets;
 
     Window() {
@@ -78,49 +78,58 @@ class Window extends JFrame {
 
         //обработка нажатия на кнопку "проверить"
         button1.addActionListener(e -> {
+            try{
 
-            Filling temp = new Filling(Integer.parseInt(textField1.getText()), Integer.parseInt(textField2.getText()), Integer.parseInt(textField3.getText()));
-            temp.setDesVolume(Integer.parseInt(textField4.getText()));
-            ArrayDeque<Integer> res = new ArrayDeque<>();
-            temp.recFill(res);
-            JOptionPane.showMessageDialog(button1, check(temp.success) + "\n" + temp.result, "Проверка", JOptionPane.WARNING_MESSAGE);
-
-        });
-
-        //обработка нажатия на кнопку "запустить"
-        button2.addActionListener((ActionEvent e) -> {
-            if (i == -42) {
-                //пропускаем через алгоритмическую часть
                 Filling temp = new Filling(Integer.parseInt(textField1.getText()), Integer.parseInt(textField2.getText()), Integer.parseInt(textField3.getText()));
                 temp.setDesVolume(Integer.parseInt(textField4.getText()));
                 ArrayDeque<Integer> res = new ArrayDeque<>();
                 temp.recFill(res);
-                resultTemp = temp.result;
-                //если решения нет - выводим сообщение
+                JOptionPane.showMessageDialog(button1, check(temp.success) + "\n" + temp.result, "Проверка", JOptionPane.WARNING_MESSAGE);
 
-                if (!temp.success)
-                    JOptionPane.showMessageDialog(button2, check(false), "Проверка", JOptionPane.WARNING_MESSAGE);
-                //запоминаем число ходов
 
-                i = 0;
-                i += temp.result.size();
-                buckets = temp;
-
-                //показываем начальный объём воды в вёдрах
-                showVolume(temp.one.getVolume(), emptyOne);
-                showVolume(temp.two.getVolume(), emptyTwo);
-                showVolume(temp.three.getVolume(), emptyThree);
-
-                //если очередь ходов не пустая
-            } else if (resultTemp.size() != 0) {
-                //меняем картинку
-                changeBuckets(resultTemp.poll(), buckets, emptyOne, emptyTwo, emptyThree);
-            } else {
-                //если пустая - сообщение о выполнении
-                JOptionPane.showMessageDialog(button2, "Выполнение закончено", "Проверка", JOptionPane.WARNING_MESSAGE);
-                i = -42;
+            }catch (NumberFormatException nfe) {
+                JOptionPane.showMessageDialog(button1, "Неверный формат данных", "Ошибка", JOptionPane.WARNING_MESSAGE);
             }
         });
+
+        //обработка нажатия на кнопку "запустить"
+        button2.addActionListener((ActionEvent e) -> {
+          try {
+              if (!i) {
+                  //пропускаем через алгоритмическую часть
+                  Filling temp = new Filling(Integer.parseInt(textField1.getText()), Integer.parseInt(textField2.getText()), Integer.parseInt(textField3.getText()));
+                  temp.setDesVolume(Integer.parseInt(textField4.getText()));
+                  ArrayDeque<Integer> res = new ArrayDeque<>();
+                  temp.recFill(res);
+                  resultTemp = temp.result;
+                  //если решения нет - выводим сообщение
+
+                  if (!temp.success)
+                      JOptionPane.showMessageDialog(button2, check(false), "Проверка", JOptionPane.WARNING_MESSAGE);
+                  //запоминаем число ходов
+
+                  i = true;
+                  buckets = temp;
+
+                  //показываем начальный объём воды в вёдрах
+                  showVolume(temp.one.getVolume(), emptyOne);
+                  showVolume(temp.two.getVolume(), emptyTwo);
+                  showVolume(temp.three.getVolume(), emptyThree);
+
+                  //если очередь ходов не пустая
+              } else if (resultTemp.size() != 0) {
+                  //меняем картинку
+                  changeBuckets(resultTemp.poll(), buckets, emptyOne, emptyTwo, emptyThree);
+              } else {
+                  //если пустая - сообщение о выполнении
+                  JOptionPane.showMessageDialog(button2, "Выполнение закончено", "Проверка", JOptionPane.WARNING_MESSAGE);
+                  i = false;
+              }
+          } catch (NumberFormatException nfe){
+              JOptionPane.showMessageDialog(button1, "Неверный формат данных", "Ошибка", JOptionPane.WARNING_MESSAGE);
+          }
+        });
+
     }
 
     //подбираем нужную картинку в соответствии с объёмом ведра
